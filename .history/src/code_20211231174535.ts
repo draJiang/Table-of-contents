@@ -53,7 +53,7 @@ var frameName = 'Table of contents' //Frame 图层默认名称
 figma.ui.onmessage = (msg) => {
   console.log('11code.ts-figma.ui.onmessage:');
   // console.log(msg);
-
+  
 
   // console.log(msg);
   // console.log(msg.data);
@@ -73,7 +73,7 @@ async function main(selectionLayerName) {
   if (selectionLayerName.indexOf('📄 ') >= 0) {
     selectionLayerName = selectionLayerName.replace('📄 ', '')
   }
-
+  
   // console.log("selectionLayerName:");
   // console.log(selectionLayerName);
 
@@ -172,7 +172,7 @@ async function main(selectionLayerName) {
     // 获取 Frame 的位置，更新后放入原来的位置
     console.log(contentFrame);
     console.log(contentFrame.absoluteRenderBounds);
-    old_frame_absoluteRenderBounds = { 'x': contentFrame.absoluteRenderBounds.x, 'y': contentFrame.absoluteRenderBounds.y }
+    old_frame_absoluteRenderBounds = {'x':contentFrame.absoluteRenderBounds.x,'y':contentFrame.absoluteRenderBounds.y}
     contentFrame.remove() // 删除旧目录
     contentFrame = figma.createFrame() // 创建新的图层容纳目录
   }
@@ -194,32 +194,26 @@ async function main(selectionLayerName) {
   contentFrame.paddingBottom = 20
   contentFrame.cornerRadius = 8
   // 设置 frame 容器的位置
-  if (old_frame_absoluteRenderBounds != null) {
+  if (old_frame_absoluteRenderBounds!=null) {
     // 如果 frame 已存在
     contentFrame.x = old_frame_absoluteRenderBounds.x
     contentFrame.y = old_frame_absoluteRenderBounds.y
-  } else {
-    var max_x = -100000000 // 记录当前页面下，所有图层中 X 的最大值
+  }else{
+    var max_x = 0 // 记录当前页面下，所有图层中 X 的最大值
     var right_frame = null
-    for (var j = 0; j < contentPage.children.length; j++) {
+    for (var j = 0; j < contentPage.children.length; j++){
       console.log('figma.currentPage.children');
       console.log(contentPage.children[j]);
-
-      if (contentPage.children[j].x > max_x) {
+      
+      if (contentPage.children[j].x>max_x) {
         max_x = contentPage.children[j].x
         right_frame = contentPage.children[j]
       }
     }
     console.log('right_frame:');
     console.log(right_frame);
-    if (right_frame == null) {
-      contentFrame.x = 0
-      contentFrame.y = 0
-    } else {
-      contentFrame.x = max_x + right_frame.width + 40
-      contentFrame.y = right_frame.y
-    }
-
+    contentFrame.x = max_x + right_frame.width + 40
+    contentFrame.y = right_frame.y
   }
 
   //将 Frame 添加到页面中
@@ -261,7 +255,7 @@ async function main(selectionLayerName) {
     var frameNode = null
     var leftTop = 3.14159265359
 
-
+    
     // var targetLayers = pages[i].findAll(n => n.name === selectionLayerName && n.type === 'FRAME')
 
     // 查找名称与选中图层相同的 FRAME 图层
@@ -280,7 +274,7 @@ async function main(selectionLayerName) {
       //渲染目录标题
       var pageTitle = figma.createText()
       pageTitle.fontName = myFont
-      pageTitle.characters = pages[i].name //文本值为页面名称
+      pageTitle.characters = 'pageName' //文本值为页面名称
       pageTitle.fontSize = 12
       pageTitle.layoutAlign = 'STRETCH' //宽度 Fill container
       pageTitle.setRangeFills(0, pageTitle.characters.length, [{ blendMode: "NORMAL", color: { r: 0, g: 0, b: 0 }, opacity: 0.3, type: "SOLID", visible: true }])
@@ -289,7 +283,7 @@ async function main(selectionLayerName) {
       contentFrame.appendChild(pageTitle)
 
       // 遍历目标图层（图层名称等于当前选中图层的名称）
-
+      
       for (var j = 0; j < targetLayers.length; j++) {
 
 
@@ -310,7 +304,7 @@ async function main(selectionLayerName) {
 
         // 在图层下查找文本图层
         var textChildren = myFindOne(targetLayers[j])
-
+        
         // console.log('textChildren:');
         // console.log(textChildren);
 
@@ -351,7 +345,7 @@ async function main(selectionLayerName) {
         // console.log(targetLayers[j].findOne(n => n.type === "TEXT").characters);
 
         // 宽度 Fill container
-        tableChildren.layoutAlign = 'STRETCH'
+        tableChildren.layoutAlign = 'STRETCH' 
         // 字号
         tableChildren.fontSize = 12
         // 链接
@@ -362,7 +356,7 @@ async function main(selectionLayerName) {
     }
 
   }
-
+  
   // console.log(contentFrame.children);
 
   // contentFrame.locked=true
@@ -388,14 +382,14 @@ async function myLoadFontAsync(myFont) {
 function myFindOne(node) {
 
   var tagetNode
-
+  
   // console.log('myFindOne');
 
   var thisChildren = node.children
   //  如果当前节点下存在子节点
 
   for (var i = 0; i < thisChildren.length; i++) {
-
+    
     // console.log('thisChildren:')
     // console.log(thisChildren);
 
@@ -412,9 +406,9 @@ function myFindOne(node) {
     if (thisChildren[i].children != null) {
 
       if (thisChildren[i].children.length > 0) {
-
+        
         // console.log('递归');
-
+        
         tagetNode = myFindOne(thisChildren[i])
       }
     }

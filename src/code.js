@@ -167,7 +167,7 @@ function main(selectionLayerName) {
             contentFrame.y = old_frame_absoluteRenderBounds.y;
         }
         else {
-            var max_x = 0; // 记录当前页面下，所有图层中 X 的最大值
+            var max_x = -100000000; // 记录当前页面下，所有图层中 X 的最大值
             var right_frame = null;
             for (var j = 0; j < contentPage.children.length; j++) {
                 console.log('figma.currentPage.children');
@@ -179,8 +179,14 @@ function main(selectionLayerName) {
             }
             console.log('right_frame:');
             console.log(right_frame);
-            contentFrame.x = max_x + right_frame.width + 40;
-            contentFrame.y = right_frame.y;
+            if (right_frame == null) {
+                contentFrame.x = 0;
+                contentFrame.y = 0;
+            }
+            else {
+                contentFrame.x = max_x + right_frame.width + 40;
+                contentFrame.y = right_frame.y;
+            }
         }
         //将 Frame 添加到页面中
         contentPage.appendChild(contentFrame);
@@ -222,7 +228,7 @@ function main(selectionLayerName) {
                 //渲染目录标题
                 var pageTitle = figma.createText();
                 pageTitle.fontName = myFont;
-                pageTitle.characters = frameName; //文本值为页面名称
+                pageTitle.characters = pages[i].name; //文本值为页面名称
                 pageTitle.fontSize = 12;
                 pageTitle.layoutAlign = 'STRETCH'; //宽度 Fill container
                 pageTitle.setRangeFills(0, pageTitle.characters.length, [{ blendMode: "NORMAL", color: { r: 0, g: 0, b: 0 }, opacity: 0.3, type: "SOLID", visible: true }]);

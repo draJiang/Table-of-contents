@@ -199,7 +199,7 @@ async function main(selectionLayerName) {
     contentFrame.x = old_frame_absoluteRenderBounds.x
     contentFrame.y = old_frame_absoluteRenderBounds.y
   } else {
-    var max_x = -100000000 // 记录当前页面下，所有图层中 X 的最大值
+    var max_x = 0 // 记录当前页面下，所有图层中 X 的最大值
     var right_frame = null
     for (var j = 0; j < contentPage.children.length; j++) {
       console.log('figma.currentPage.children');
