@@ -2,8 +2,6 @@
 
 Figma 插件，用于生成图层目录
 
-Creates rectangles (same as the [Webpack sample plugin][webpack]).
-
 This demonstrates:
 
 - bundling plugin code using Webpack, and
