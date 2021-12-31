@@ -201,13 +201,10 @@ async function main(selectionLayerName) {
   }else{
     var max_x = 0 // 记录当前页面下，所有图层中 X 的最大值
     var right_frame = null
-    for (var j = 0; j < contentPage.children.length; j++){
-      console.log('figma.currentPage.children');
-      console.log(contentPage.children[j]);
-      
-      if (contentPage.children[j].x>max_x) {
-        max_x = contentPage.children[j].x
-        right_frame = contentPage.children[j]
+    for (var j = 0; j < figma.currentPage.children.length; j++){
+      if (figma.currentPage.children[j].x>max_x) {
+        max_x = figma.currentPage.children[j].x
+        right_frame = figma.currentPage.children[j]
       }
     }
     console.log('right_frame:');
@@ -310,10 +307,10 @@ async function main(selectionLayerName) {
 
         // 如果有找到文本图层
         if (textChildren != undefined) {
-          tableChildren.characters = tableOfContensIndex.toString() + ') ' + textChildren.characters.substring(0, 28) + '...↗'
+          tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + textChildren.characters.substring(0, 28) + '...↗'
         } else {
           // 如果没有找到文本图层，设置新图层的字符信息 = 目标图层的名称
-          tableChildren.characters = tableOfContensIndex.toString() + ') ' + targetLayers[j].name + ' ↗'
+          tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + targetLayers[j].name + ' ↗'
         }
 
         // console.log('figma.currentPage.findChildren(n => n.type === "FRAME"):')

@@ -310,10 +310,10 @@ async function main(selectionLayerName) {
 
         // 如果有找到文本图层
         if (textChildren != undefined) {
-          tableChildren.characters = tableOfContensIndex.toString() + ') ' + textChildren.characters.substring(0, 28) + '...↗'
+          tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + textChildren.characters.substring(0, 28) + '...↗'
         } else {
           // 如果没有找到文本图层，设置新图层的字符信息 = 目标图层的名称
-          tableChildren.characters = tableOfContensIndex.toString() + ') ' + targetLayers[j].name + ' ↗'
+          tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + targetLayers[j].name + ' ↗'
         }
 
         // console.log('figma.currentPage.findChildren(n => n.type === "FRAME"):')

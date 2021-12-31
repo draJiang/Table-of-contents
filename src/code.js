@@ -20,7 +20,7 @@ onChange();
 // }
 // 根据选中状态渲染 UI
 function onChange() {
-    console.log('code.ts:selectionchange');
+    console.log('183code.ts:selectionchange');
     if (figma.currentPage.selection.length > 0) {
         // UI 中显示选中的图层名称
         figma.ui.postMessage({ 'selectionName': figma.currentPage.selection[0].name, 'erroMsg': '' });
@@ -66,8 +66,8 @@ function main(selectionLayerName) {
         }
         // console.log("selectionLayerName:");
         // console.log(selectionLayerName);
-        pageName = '📄 ' + selectionLayerName;
-        frameName = pageName;
+        pageName = '📄 ' + 'Table of contents';
+        frameName = '📄 ' + selectionLayerName;
         //查找当前选中图层中的文本图层，获取起字体作为默认字体
         var fristText;
         //如果当前有选中图层
@@ -127,6 +127,7 @@ function main(selectionLayerName) {
                 break;
             }
         }
+        var old_frame_absoluteRenderBounds = null; // 记录老目录图层的位置
         if (contentPage == null) {
             //不存在页面，新建
             contentPage = figma.createPage();
@@ -137,8 +138,13 @@ function main(selectionLayerName) {
             contentFrame = figma.createFrame();
         }
         else {
-            contentFrame.remove();
-            contentFrame = figma.createFrame();
+            // 已存在 Frame
+            // 获取 Frame 的位置，更新后放入原来的位置
+            console.log(contentFrame);
+            console.log(contentFrame.absoluteRenderBounds);
+            old_frame_absoluteRenderBounds = { 'x': contentFrame.absoluteRenderBounds.x, 'y': contentFrame.absoluteRenderBounds.y };
+            contentFrame.remove(); // 删除旧目录
+            contentFrame = figma.createFrame(); // 创建新的图层容纳目录
         }
         //设置页面
         contentPage.name = pageName;
@@ -154,15 +160,37 @@ function main(selectionLayerName) {
         contentFrame.paddingRight = 20;
         contentFrame.paddingBottom = 20;
         contentFrame.cornerRadius = 8;
+        // 设置 frame 容器的位置
+        if (old_frame_absoluteRenderBounds != null) {
+            // 如果 frame 已存在
+            contentFrame.x = old_frame_absoluteRenderBounds.x;
+            contentFrame.y = old_frame_absoluteRenderBounds.y;
+        }
+        else {
+            var max_x = 0; // 记录当前页面下，所有图层中 X 的最大值
+            var right_frame = null;
+            for (var j = 0; j < contentPage.children.length; j++) {
+                console.log('figma.currentPage.children');
+                console.log(contentPage.children[j]);
+                if (contentPage.children[j].x > max_x) {
+                    max_x = contentPage.children[j].x;
+                    right_frame = contentPage.children[j];
+                }
+            }
+            console.log('right_frame:');
+            console.log(right_frame);
+            contentFrame.x = max_x + right_frame.width + 40;
+            contentFrame.y = right_frame.y;
+        }
         //将 Frame 添加到页面中
         contentPage.appendChild(contentFrame);
         //目录标题
         var contentText = figma.createText();
         contentText.fontName = myFont;
-        contentText.characters = pageName;
+        contentText.characters = frameName;
         contentText.fontSize = 24;
         contentText.layoutAlign = 'STRETCH'; //宽度 Fill container
-        contentText.setRangeLineHeight(0, pageName.length, { value: 40, unit: 'PIXELS' });
+        contentText.setRangeLineHeight(0, frameName.length, { value: 40, unit: 'PIXELS' });
         contentText.locked = true;
         //将目标标题添加到 Frame 中
         contentFrame.appendChild(contentText);
@@ -194,7 +222,7 @@ function main(selectionLayerName) {
                 //渲染目录标题
                 var pageTitle = figma.createText();
                 pageTitle.fontName = myFont;
-                pageTitle.characters = pages[i].name; //文本值为页面名称
+                pageTitle.characters = frameName; //文本值为页面名称
                 pageTitle.fontSize = 12;
                 pageTitle.layoutAlign = 'STRETCH'; //宽度 Fill container
                 pageTitle.setRangeFills(0, pageTitle.characters.length, [{ blendMode: "NORMAL", color: { r: 0, g: 0, b: 0 }, opacity: 0.3, type: "SOLID", visible: true }]);
@@ -220,11 +248,11 @@ function main(selectionLayerName) {
                     // console.log(textChildren);
                     // 如果有找到文本图层
                     if (textChildren != undefined) {
-                        tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + textChildren.characters.substring(0, 28) + '...↗';
+                        tableChildren.characters = tableOfContensIndex.toString() + ') ' + textChildren.characters.substring(0, 28) + '...↗';
                     }
                     else {
                         // 如果没有找到文本图层，设置新图层的字符信息 = 目标图层的名称
-                        tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + targetLayers[j].name + ' ↗';
+                        tableChildren.characters = tableOfContensIndex.toString() + ') ' + targetLayers[j].name + ' ↗';
                     }
                     // console.log('figma.currentPage.findChildren(n => n.type === "FRAME"):')
                     // console.log(figma.currentPage.findChildren(n => n.type === "FRAME")[0])

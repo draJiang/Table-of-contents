@@ -170,8 +170,6 @@ async function main(selectionLayerName) {
   } else {
     // 已存在 Frame
     // 获取 Frame 的位置，更新后放入原来的位置
-    console.log(contentFrame);
-    console.log(contentFrame.absoluteRenderBounds);
     old_frame_absoluteRenderBounds = {'x':contentFrame.absoluteRenderBounds.x,'y':contentFrame.absoluteRenderBounds.y}
     contentFrame.remove() // 删除旧目录
     contentFrame = figma.createFrame() // 创建新的图层容纳目录
@@ -194,27 +192,6 @@ async function main(selectionLayerName) {
   contentFrame.paddingBottom = 20
   contentFrame.cornerRadius = 8
   // 设置 frame 容器的位置
-  if (old_frame_absoluteRenderBounds!=null) {
-    // 如果 frame 已存在
-    contentFrame.x = old_frame_absoluteRenderBounds.x
-    contentFrame.y = old_frame_absoluteRenderBounds.y
-  }else{
-    var max_x = 0 // 记录当前页面下，所有图层中 X 的最大值
-    var right_frame = null
-    for (var j = 0; j < contentPage.children.length; j++){
-      console.log('figma.currentPage.children');
-      console.log(contentPage.children[j]);
-      
-      if (contentPage.children[j].x>max_x) {
-        max_x = contentPage.children[j].x
-        right_frame = contentPage.children[j]
-      }
-    }
-    console.log('right_frame:');
-    console.log(right_frame);
-    contentFrame.x = max_x + right_frame.width + 40
-    contentFrame.y = right_frame.y
-  }
 
   //将 Frame 添加到页面中
   contentPage.appendChild(contentFrame)
@@ -310,10 +287,10 @@ async function main(selectionLayerName) {
 
         // 如果有找到文本图层
         if (textChildren != undefined) {
-          tableChildren.characters = tableOfContensIndex.toString() + ') ' + textChildren.characters.substring(0, 28) + '...↗'
+          tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + textChildren.characters.substring(0, 28) + '...↗'
         } else {
           // 如果没有找到文本图层，设置新图层的字符信息 = 目标图层的名称
-          tableChildren.characters = tableOfContensIndex.toString() + ') ' + targetLayers[j].name + ' ↗'
+          tableChildren.characters = '【' + tableOfContensIndex.toString() + '】 ' + targetLayers[j].name + ' ↗'
         }
 
         // console.log('figma.currentPage.findChildren(n => n.type === "FRAME"):')
