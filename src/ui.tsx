@@ -36,21 +36,21 @@ function HaveData(props) {
 
 //底部按钮
 class BottomBtn extends React.Component
-<
-{
-  ln?: string
-  value?: string
-  disable?: Boolean
-  layerName?: string
-  bottomBtnHandleClick?:Function
-},
-{
-  ln?: string
-  value?: string
-  disable?: Boolean
-  layerName?: string
-  bottomBtnHandleClick?:Function
-}
+  <
+  {
+    ln?: string
+    value?: string
+    disable?: Boolean
+    layerName?: string
+    bottomBtnHandleClick?: Function
+  },
+  {
+    ln?: string
+    value?: string
+    disable?: Boolean
+    layerName?: string
+    bottomBtnHandleClick?: Function
+  }
 >
 {
   constructor(props) {
@@ -68,18 +68,8 @@ class BottomBtn extends React.Component
     console.log('BottomBtn handleClick');
     // console.log(this);
     // console.log(this.props);
-    
+
     this.props.bottomBtnHandleClick()
-    // console.log('handleClick：');
-    // console.log(this);
-    // console.log(this.props.ln);
-    // console.log(this.props.value);
-    // // console.log(a);
-    // //给 code.ts 发消息
-    // // parent.postMessage('hello,my name is UI.tsx')
-    // parent.postMessage({ pluginMessage: { type: 'Run', data: this.props.ln } }, '*')
-    // console.log('BottomBtn-props.layerName:');
-    // console.log(props.layerName);
 
   }
 
@@ -90,8 +80,8 @@ class BottomBtn extends React.Component
     // console.log(this.state.disable);
     // console.log(this.state);
     // console.log(this.props);
-    
-    
+
+
     if (this.props.disable == true) {
       return (
         <DisableBtn value={this.props.value} />
@@ -102,7 +92,7 @@ class BottomBtn extends React.Component
     return (
       // 可点击状态
       <Btn BtnHandleClick={this.handleClick.bind(this)} value={this.props.value} ln={this.props.layerName} />
-    ) 
+    )
   }
 
 
@@ -125,12 +115,12 @@ class Btn extends React.Component
   {
     value?: string
     ln?: string
-    BtnHandleClick?:Function
+    BtnHandleClick?: Function
   },
   {
     ln?: string
     value?: string
-    BtnHandleClick?:Function
+    BtnHandleClick?: Function
   }
 >
 {
@@ -154,7 +144,7 @@ class Btn extends React.Component
     // console.log(a);
     //给 code.ts 发消息
     // parent.postMessage('hello,my name is UI.tsx')
-    parent.postMessage({ pluginMessage: { type: 'Run', data: this.props.ln } }, '*')
+    // parent.postMessage({ pluginMessage: { type: 'Run', data: this.props.ln } }, '*')
 
   }
 
@@ -211,14 +201,14 @@ class ShowUI extends React.Component
   {
     layerName?: string
     erroMsg?: string
-    loading?:boolean
+    loading?: boolean
     // handleBtnClick?:Function
   }>
 {
 
   constructor(props) {
     super(props);
-    this.state = { layerName: '', erroMsg: '',loading:false };
+    this.state = { layerName: '', erroMsg: '', loading: false };
   }
 
   //组件创建时
@@ -255,25 +245,30 @@ class ShowUI extends React.Component
     }
   }
 
-  handleBtnClick(this){
+  handleBtnClick(this) {
     // 点击运行时
     console.log('ShowUI handleBtnClick')
     // console.log(this);
     this.setState({
       loading: true,
+    }, () => {
+      setTimeout(() => {
+        parent.postMessage({ pluginMessage: { type: 'Run', data: 'undefined' } }, '*')
+      }, 15)
+
     })
 
-    
+
   }
 
   render() {
 
     // console.log('this.state.layerName:');
     // console.log(this.state.layerName);
-    
+
     if (this.state.loading) {
       console.log('this.state.loading');
-      
+
       return (
         //渲染加载中界面
         <div>
@@ -286,7 +281,7 @@ class ShowUI extends React.Component
 
     if (this.state.layerName == '') {
       console.log('this.state.layerName =="" ');
-      
+
       return (
         //渲染空数据界面
         <div>

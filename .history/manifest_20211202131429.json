@@ -1,8 +1,0 @@
-{
-    "name": "Table of contents",
-    "id": "1048103390719092358",
-    "api": "1.0.0",
-    "main": "dist/code.js",
-    "ui": "dist/ui.html",
-    "editorType": ["figma"]
-}

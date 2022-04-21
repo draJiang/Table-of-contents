@@ -37,16 +37,6 @@ class BottomBtn extends React.Component {
         // console.log(this);
         // console.log(this.props);
         this.props.bottomBtnHandleClick();
-        // console.log('handleClick：');
-        // console.log(this);
-        // console.log(this.props.ln);
-        // console.log(this.props.value);
-        // // console.log(a);
-        // //给 code.ts 发消息
-        // // parent.postMessage('hello,my name is UI.tsx')
-        // parent.postMessage({ pluginMessage: { type: 'Run', data: this.props.ln } }, '*')
-        // console.log('BottomBtn-props.layerName:');
-        // console.log(props.layerName);
     }
     render() {
         // 如果传来的属性 disable == true（置灰）
@@ -87,7 +77,7 @@ class Btn extends React.Component {
         // console.log(a);
         //给 code.ts 发消息
         // parent.postMessage('hello,my name is UI.tsx')
-        parent.postMessage({ pluginMessage: { type: 'Run', data: this.props.ln } }, '*');
+        // parent.postMessage({ pluginMessage: { type: 'Run', data: this.props.ln } }, '*')
     }
     render() {
         return (React.createElement("div", { className: 'bottomBtnDiv' },
@@ -148,6 +138,10 @@ class ShowUI extends React.Component {
         // console.log(this);
         this.setState({
             loading: true,
+        }, () => {
+            setTimeout(() => {
+                parent.postMessage({ pluginMessage: { type: 'Run', data: 'undefined' } }, '*');
+            }, 15);
         });
     }
     render() {
