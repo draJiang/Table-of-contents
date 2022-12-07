@@ -15,6 +15,12 @@ button {
     outline: none;
 }
 
+.main_box {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
 #create {
     box-shadow: none;
     background: #18A0FB;
@@ -52,7 +58,7 @@ input:focus {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    position: absolute;
+    /* position: absolute; */
     top: 40px;
     left: 0;
     right: 0;
@@ -61,6 +67,7 @@ input:focus {
     vertical-align: middle;
     /*水平居中*/
     text-align: center;
+    flex: 1;
 }
 
 .emptyDataBox,
@@ -97,15 +104,19 @@ input:focus {
 }
 
 .bottomBtnDiv {
-    width: 100%;
-    height: 50px;
-    position: absolute;
+    /* width: 100%; */
+    /* height: 50px; */
+    /* position: absolute; */
     bottom: 0px;
+}
+
+.bottomBtnDiv .Btn:hover {
+    opacity: 0.6;
 }
 
 .DisableBtn,
 .Btn {
-    position: absolute;
+    /* position: absolute; */
     right: 20px;
     height: 32px;
     width: 68px;
@@ -136,4 +147,23 @@ input:focus {
 
 .erroMsgHidden {
     display: none;
+}
+
+.bottom_box {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.bottom_box .checkbox label {
+    display: flex;
+    align-items: flex-start;
+    flex: 1;
+    text-align: left;
+}
+
+.checkbox input {
+    /* margin-right: 4px; */
 }

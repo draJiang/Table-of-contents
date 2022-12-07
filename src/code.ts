@@ -5,11 +5,38 @@ var selection: any = []        // 记录当前选中的图层
 //@ts-ignore
 figma.skipInvisibleInstanceChildren = true
 // 显示 UI
-figma.showUI(__html__, { width: 300, height: 300 });
-console.log('0420');
 
-// 初始化 UI
-onChange()
+figma.showUI(__html__, { width: 300, height: 300 });
+console.log('20221207');
+
+// 获取设置记录
+figma.clientStorage.getAsync('seting').then(seting_value => {
+
+  console.log('figma.clientStorage.getAsync:');
+
+  console.log(seting_value);
+
+  if (seting_value.seting_set_frame_name === undefined) {
+    console.log('seting_value === undefined');
+
+    seting_value.seting_set_frame_name = false
+  }
+
+  console.log('seting_value:');
+  console.log(seting_value);
+
+
+  // 将设置记录发送给 UI
+  figma.ui.postMessage({ 'type': 'getClientStorage', 'data': { 'seting': seting_value } });
+
+  // 初始化 UI
+  onChange()
+
+})
+
+
+
+
 
 // 根据选中状态渲染 UI
 function onChange() {
@@ -19,11 +46,11 @@ function onChange() {
 
   if (figma.currentPage.selection.length == 1) {
     // UI 中显示选中的图层名称
-    figma.ui.postMessage({ 'selectionName': figma.currentPage.selection[0].name, 'erroMsg': '' })
+    figma.ui.postMessage({ 'selectionName': figma.currentPage.selection[0].name, 'erroMsg': '', 'selectionLength': figma.currentPage.selection.length })
   } else if (figma.currentPage.selection.length > 1) {
-    figma.ui.postMessage({ 'selectionName': 'Multi-select', 'erroMsg': '' })
+    figma.ui.postMessage({ 'selectionName': 'Multi-select', 'erroMsg': '', 'selectionLength': figma.currentPage.selection.length })
   } else {
-    figma.ui.postMessage({ 'selectionName': '', 'erroMsg': '' })
+    figma.ui.postMessage({ 'selectionName': '', 'erroMsg': '', 'selectionLength': figma.currentPage.selection.length })
   }
 
   // 如果选中的不是 FRAME
@@ -53,9 +80,15 @@ var frameName = 'Table of contents' //Frame 图层默认名称
 
 // UI 发来消息
 figma.ui.onmessage = (msg) => {
-  console.log('11code.ts-figma.ui.onmessage:');
+  console.log('============ code.ts-figma.ui.onmessage:');
+  // 记录设置类型 seting_set_frame_name
+  console.log(msg);
 
-  main(msg.data)
+  // 将最近一次设置记录下来
+  figma.clientStorage.setAsync('seting', { 'seting_set_frame_name': msg.seting_set_frame_name }).then(() => {
+    main(msg.data, msg.seting_set_frame_name)
+  })
+
 };
 
 
@@ -148,7 +181,7 @@ function setFrame(pageName, frameName, font, isMultiSelect) {
   } else {
     // 已存在 Frame
     // 获取 Frame 的位置，更新后放入原来的位置
-    
+
     old_frame_absoluteRenderBounds = { 'x': contentFrame.absoluteRenderBounds.x, 'y': contentFrame.absoluteRenderBounds.y }
     contentFrame.remove() // 删除旧目录
     contentFrame = figma.createFrame() // 创建新的图层容纳目录
@@ -186,7 +219,7 @@ function setFrame(pageName, frameName, font, isMultiSelect) {
         right_frame = contentPage.children[j]
       }
     }
-    
+
     if (right_frame == null) {
       contentFrame.x = 0
       contentFrame.y = 0
@@ -216,7 +249,7 @@ function setFrame(pageName, frameName, font, isMultiSelect) {
 }
 
 // 渲染目录内容
-function setContent(contentFrame, targetLayers, font: FontName, index) {
+function setContent(contentFrame, targetLayers, font: FontName, index, seting_set_frame_name = false) {
 
   //渲染修订信息 ==============================
   var tableChildren = figma.createText()
@@ -226,16 +259,28 @@ function setContent(contentFrame, targetLayers, font: FontName, index) {
   var targetLayersChildren
   targetLayersChildren = targetLayers['children']
 
-  // 在图层下查找文本图层
-  var textChildren = myFindOne(targetLayers)
+  // 目录文字
+  var textChildren = myFindOne(targetLayers) // 在图层下查找文本图层
 
-  // 如果有找到文本图层
-  if (textChildren != undefined) {
-    tableChildren.characters = index.toString() + ') ' + textChildren.characters.substring(0, 28) + '...↗'
-  } else {
-    // 如果没有找到文本图层，设置新图层的字符信息 = 目标图层的名称
+
+  //如果用户选择显示图层名称
+  if (seting_set_frame_name) {
+
     tableChildren.characters = index.toString() + ') ' + targetLayers.name + ' ↗'
+
+  } else {
+
+    if (textChildren != undefined) {
+      // 如果有找到文本图层
+      tableChildren.characters = index.toString() + ') ' + textChildren.characters.substring(0, 28) + '...↗'
+    } else {
+      // 如果没有找到文本图层，设置新图层的字符信息 = 目标图层的名称
+      tableChildren.characters = index.toString() + ') ' + targetLayers.name + ' ↗'
+    }
+
   }
+
+
 
   // 文字颜色
   tableChildren.setRangeFills(0, tableChildren.characters.length, [{ blendMode: "NORMAL", color: { r: 0, g: 0, b: 0 }, opacity: 0.8, type: "SOLID", visible: true }])
@@ -267,7 +312,7 @@ function setPageTitle(pageName, font) {
 
 
 //主逻辑
-async function main(selectionLayerName) {
+async function main(selectionLayerName, seting_set_frame_name) {
 
   selectionLayerName = selection[0]['name']
 
@@ -313,7 +358,7 @@ async function main(selectionLayerName) {
       }
 
       // 渲染目录内容
-      setContent(contentFrame, selection[i], myFont, count+=1)
+      setContent(contentFrame, selection[i], myFont, count += 1, seting_set_frame_name)
 
 
     }

@@ -1,6 +1,8 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import './ui.css'
+// import { selectMenu, disclosure } from 'figma-plugin-ds';
+
 
 declare function require(path: string): any
 
@@ -23,12 +25,14 @@ function EmptyData(props) {
 
 //有数据组件
 function HaveData(props) {
+
   return (
     <div className='haveData'>
       <div className='haveDataBox'>
         {props.layerName}
       </div>
       <p className='info'>{props.msg}</p>
+      {/* {checkbox} */}
     </div>
 
   );
@@ -37,21 +41,24 @@ function HaveData(props) {
 //底部按钮
 class BottomBtn extends React.Component
   <
-  {
-    ln?: string
-    value?: string
-    disable?: Boolean
-    layerName?: string
-    bottomBtnHandleClick?: Function
-  },
-  {
-    ln?: string
-    value?: string
-    disable?: Boolean
-    layerName?: string
-    bottomBtnHandleClick?: Function
-  }
->
+    {
+      ln?: string
+      value?: string
+      disable?: Boolean
+      layerName?: string
+      bottomBtnHandleClick?: Function
+      handleSetting?: Function
+      selectionLength?: number
+      seting_set_frame_name?:boolean
+    },
+    {
+      ln?: string
+      value?: string
+      disable?: Boolean
+      layerName?: string
+      bottomBtnHandleClick?: Function
+    }
+  >
 {
   constructor(props) {
     super(props);
@@ -73,25 +80,59 @@ class BottomBtn extends React.Component
 
   }
 
+  // 设置按钮点击事件
+  handleSetting = (e) => {
+    console.log('BottomBtn handleSetting');
+    console.log(e);
+    console.log(e.target);
+    console.log(e.target.checked);
+    this.props.handleSetting(e.target.checked)
+
+  }
 
   render(this) {
     // 如果传来的属性 disable == true（置灰）
     console.log('this.state.disable:');
-    // console.log(this.state.disable);
-    // console.log(this.state);
-    // console.log(this.props);
-
 
     if (this.props.disable == true) {
+      // 置灰状态
       return (
-        <DisableBtn value={this.props.value} />
+        <div className='bottom_box'>
+          <DisableBtn value={this.props.value} />
+        </div>
+
       )
 
     }
 
+    console.log('bottomBtn:');
+    console.log(this.props);    
+    
+    // 复选框
+    let checkbox
+
+    if (this.props.selectionLength > 1) {
+
+      checkbox = <div className="checkbox">
+        
+        <label>
+        <input id="seting_set_frame_name" type="checkbox" defaultChecked={this.props.seting_set_frame_name} className="checkbox__box" onClick={this.handleSetting.bind(Event)} /> <span>Use the layer name as the directory name</span>
+        </label>
+      </div>
+
+    } else {
+      checkbox = ''
+    }
+
     return (
       // 可点击状态
-      <Btn BtnHandleClick={this.handleClick.bind(this)} value={this.props.value} ln={this.props.layerName} />
+      <div className='bottom_box'>
+
+        {checkbox}
+        <Btn BtnHandleClick={this.handleClick.bind(this)} value={this.props.value} ln={this.props.layerName} />
+
+      </div>
+
     )
   }
 
@@ -112,17 +153,17 @@ function DisableBtn(props) {
 //普通按钮
 class Btn extends React.Component
   <
-  {
-    value?: string
-    ln?: string
-    BtnHandleClick?: Function
-  },
-  {
-    ln?: string
-    value?: string
-    BtnHandleClick?: Function
-  }
->
+    {
+      value?: string
+      ln?: string
+      BtnHandleClick?: Function
+    },
+    {
+      ln?: string
+      value?: string
+      BtnHandleClick?: Function
+    }
+  >
 {
 
   constructor(props) {
@@ -162,10 +203,10 @@ class ShowErroMsg extends React.Component
   <{
     msg?: string
   },
-  {
-    msg?: string
-  }
->
+    {
+      msg?: string
+    }
+  >
 {
   constructor(props) {
     super(props);
@@ -178,7 +219,7 @@ class ShowErroMsg extends React.Component
     // console.log(this.state.msg);
     // console.log(this.props.msg);
 
-    if (this.props.msg == '') {
+    if (this.props.msg == '' || this.props.msg == undefined) {
 
 
 
@@ -198,17 +239,21 @@ class ShowErroMsg extends React.Component
 //调度组件，用于条件渲染
 class ShowUI extends React.Component
   <{},
-  {
-    layerName?: string
-    erroMsg?: string
-    loading?: boolean
-    // handleBtnClick?:Function
-  }>
+    {
+      layerName?: string
+      erroMsg?: string
+      loading?: boolean
+      selectionLength?: number
+      seting_set_frame_name?: boolean
+      // handleBtnClick?:Function
+    }>
 {
 
   constructor(props) {
     super(props);
-    this.state = { layerName: '', erroMsg: '', loading: false };
+    this.state = { layerName: '', erroMsg: '', loading: false, selectionLength: 0, seting_set_frame_name: false };
+    this.handleSetting = this.handleSetting.bind(this);
+
   }
 
   //组件创建时
@@ -219,27 +264,52 @@ class ShowUI extends React.Component
       // console.log(event.data.pluginMessage);
       console.log('onmessage');
 
-      var selectionName = event.data.pluginMessage.selectionName
-      var msg = event.data.pluginMessage.erroMsg
+      if (event.data.pluginMessage.type === 'getClientStorage') {
+        // 读取历史记录
+        
+        console.log(event.data.pluginMessage);
 
-      if (selectionName != '') {
-
-        // selection = event.data.pluginMessage[0].name
+        if (event.data.pluginMessage.data.seting.seting_set_frame_name !== this.state.seting_set_frame_name) {
+          this.setState({
+            seting_set_frame_name: event.data.pluginMessage.data.seting.seting_set_frame_name
+          })
+        }
+        
       } else {
 
-        // selection = '空'
+        // 
+
+        var selectionName = event.data.pluginMessage.selectionName
+        var msg = event.data.pluginMessage.erroMsg
+        var selectionLength = event.data.pluginMessage.selectionLength
+        console.log('selectionLength:');
+        console.log(event.data.pluginMessage);
+
+        console.log(selectionLength);
+
+
+        if (selectionName != '') {
+
+          // selection = event.data.pluginMessage[0].name
+        } else {
+
+          // selection = '空'
+        }
+
+        // console.log('selectionName:');
+        // console.log(selectionName);
+
+        this.setState({
+          layerName: selectionName,
+          erroMsg: msg,
+          selectionLength: selectionLength
+        })
+
+        console.log('ShowUI-this.state.layerName:');
+        // console.log(this.state.layerName);
       }
 
-      // console.log('selectionName:');
-      // console.log(selectionName);
 
-      this.setState({
-        layerName: selectionName,
-        erroMsg: msg
-      })
-
-      console.log('ShowUI-this.state.layerName:');
-      // console.log(this.state.layerName);
 
 
     }
@@ -253,11 +323,24 @@ class ShowUI extends React.Component
       loading: true,
     }, () => {
       setTimeout(() => {
-        parent.postMessage({ pluginMessage: { type: 'Run', data: 'undefined' } }, '*')
+        parent.postMessage({ pluginMessage: { type: 'Run', data: 'undefined', seting_set_frame_name: this.state.seting_set_frame_name } }, '*')
       }, 15)
 
     })
 
+
+  }
+
+  handleSetting(checked) {
+    console.log('ShowUI handleSetting');
+    console.log(checked);
+    console.log(this.state);
+
+    if (checked !== this.state.seting_set_frame_name) {
+      this.setState({
+        seting_set_frame_name: checked
+      })
+    }
 
   }
 
@@ -266,12 +349,13 @@ class ShowUI extends React.Component
     // console.log('this.state.layerName:');
     // console.log(this.state.layerName);
 
+    //渲染加载中界面
     if (this.state.loading) {
       console.log('this.state.loading');
 
       return (
-        //渲染加载中界面
-        <div>
+
+        <div className='main_box'>
           <ShowErroMsg msg={this.state.erroMsg} />
           <HaveData msg='Run will generate directory' layerName={this.state.layerName} />
           <BottomBtn disable={true} value='Running' />
@@ -279,12 +363,13 @@ class ShowUI extends React.Component
       )
     }
 
+    //渲染空数据界面
     if (this.state.layerName == '') {
       console.log('this.state.layerName =="" ');
 
       return (
-        //渲染空数据界面
-        <div>
+
+        <div className='main_box'>
           <ShowErroMsg msg={this.state.erroMsg} />
           <EmptyData msg='Please select a layer' />
           <BottomBtn disable={true} value='Run' />
@@ -292,12 +377,14 @@ class ShowUI extends React.Component
       )
     }
 
+    // 如果选中多个图层，则允许设置使用图层名称作为目录名称
+
     return (
       //渲染有数据界面
-      <div>
+      <div className='main_box'>
         <ShowErroMsg msg={this.state.erroMsg} />
         <HaveData msg='Run will generate directory' layerName={this.state.layerName} />
-        <BottomBtn bottomBtnHandleClick={this.handleBtnClick.bind(this)} disable={false} value='Run' layerName={this.state.layerName} />
+        <BottomBtn handleSetting={this.handleSetting} bottomBtnHandleClick={this.handleBtnClick.bind(this)} selectionLength={this.state.selectionLength} seting_set_frame_name = {this.state.seting_set_frame_name} disable={false} value='Run' layerName={this.state.layerName} />
       </div>
     )
   }
