@@ -7,7 +7,7 @@ figma.skipInvisibleInstanceChildren = true
 // 显示 UI
 
 figma.showUI(__html__, { width: 300, height: 300 });
-console.log('20221207');
+console.log('20230104');
 
 // 获取设置记录
 figma.clientStorage.getAsync('seting').then(seting_value => {
@@ -33,8 +33,6 @@ figma.clientStorage.getAsync('seting').then(seting_value => {
   onChange()
 
 })
-
-
 
 
 
@@ -262,7 +260,6 @@ function setContent(contentFrame, targetLayers, font: FontName, index, seting_se
   // 目录文字
   var textChildren = myFindOne(targetLayers) // 在图层下查找文本图层
 
-
   //如果用户选择显示图层名称
   if (seting_set_frame_name) {
 
@@ -321,7 +318,7 @@ async function main(selectionLayerName, seting_set_frame_name) {
 
   if (selection.length > 1) {
 
-    console.log('选中多个图层1');
+    console.log('选中多个图层');
 
     frameName = pageName
     // 设置目录的字体 ==============================
@@ -352,8 +349,16 @@ async function main(selectionLayerName, seting_set_frame_name) {
     for (let i = 0; i < selection.length; i++) {
       // 遍历目标图层（图层名称等于当前选中图层的名称）
 
-      // 如果图层类型不是 FRAME 则忽略，同时忽略组件下的图层
-      if (selection[i].type != 'FRAME' || selection[i].id.indexOf('I') >= 0) {
+      // if (selection[i].type != 'FRAME' || selection[i].id.indexOf('I') >= 0) {
+      //   continue
+      // }
+
+      // 忽略组件下的图层
+      if (selection[i].id.indexOf('I') >= 0) {
+        continue
+      }
+      // 如果图层类型不是 FRAME、SECTION 则忽略，同时忽
+      if (selection[i].type != 'FRAME' && selection[i].type != 'SECTION') {
         continue
       }
 
@@ -413,6 +418,15 @@ async function main(selectionLayerName, seting_set_frame_name) {
           // 查找名称与选中图层相同的 FRAME 图层
 
           targetLayers = page.findAll(n => n.name === selectionLayerName && n.type === 'FRAME')
+          //@ts-ignore
+          var targetSections = page.findAll(n => n.name === selectionLayerName && n.type === 'SECTION')
+          targetLayers = targetLayers.concat(targetSections)
+          console.log('targetLayers:');
+
+          console.log(targetLayers);
+          console.log(targetSections);
+
+
 
           // 如果名称与选中图层相同的 FRAME 图层数量 > 0
           if (targetLayers.length > 0) {
@@ -428,8 +442,12 @@ async function main(selectionLayerName, seting_set_frame_name) {
 
             for (var j = 0; j < targetLayers.length; j++) {
 
-              // 如果图层类型不是 FRAME 则忽略，同时忽略组件下的图层
-              if (targetLayers[j].type != 'FRAME' || targetLayers[j].id.indexOf('I') >= 0) {
+              // 忽略组件下的图层
+              if (targetLayers[j].id.indexOf('I') >= 0) {
+                continue
+              }
+              // 如果图层类型不是 FRAME、SECTION 则忽略，同时忽
+              if (targetLayers[j].type != 'FRAME' && targetLayers[j].type != 'SECTION') {
                 continue
               }
 

@@ -13,7 +13,7 @@ var selection = []; // 记录当前选中的图层
 figma.skipInvisibleInstanceChildren = true;
 // 显示 UI
 figma.showUI(__html__, { width: 300, height: 300 });
-console.log('20221207');
+console.log('0420');
 // 初始化 UI
 onChange();
 // 根据选中状态渲染 UI

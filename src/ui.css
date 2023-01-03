@@ -163,7 +163,3 @@ input:focus {
     flex: 1;
     text-align: left;
 }
-
-.checkbox input {
-    /* margin-right: 4px; */
-}
